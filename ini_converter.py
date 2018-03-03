@@ -35,15 +35,17 @@ def serializer(data):
         if m:
             (groupname, state) = m.groups()        
             state = state or 'hosts'
+            if groupname not in _json:
+                _json[groupname] = {}
             if state not in ['hosts', 'children', 'vars']:
                 title = ":".join(m.groups())
                 #self._raise_error("Section [%s] has unknown type: %s" % (title, state))
             if state == 'hosts':
-                _json[groupname] = {"hosts" : []}
+                _json[groupname]["hosts"] = []
             if state == 'vars':
-                _json[groupname] = {"vars" : {}}
+                _json[groupname]["vars"] = {}
             if state == 'children':
-                _json[groupname] = {"children" : []}            
+                _json[groupname]["children"] = []
         else:
             a = shlex.split(row, comments=True)
             if state == 'children':
