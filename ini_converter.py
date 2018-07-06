@@ -20,7 +20,7 @@ def serializer(data):
                 ''', re.X
     )
 
-    state = ''
+    state = None
     groupname = ''
     for row in data.split('\n'):
         row = row.strip()
@@ -32,32 +32,24 @@ def serializer(data):
             state = state or 'hosts'
             if groupname not in _json:
                 _json[groupname] = {}
-            if state not in ['hosts', 'children', 'vars']:
-                title = ":".join(m.groups())
-                raise ValueError("Section [%s] has unknown type: %s" % (title, state))
-            if state == 'hosts':
-                _json[groupname]["hosts"] = []
-            if state == 'vars':
-                _json[groupname]["vars"] = {}
-            if state == 'children':
-                _json[groupname]["children"] = []
         else:
             a = shlex.split(row, comments=True)
             if state == 'children':
-                _json[groupname][state].append(a[0])
+                _json[groupname].setdefault(state, []).append(a[0])
             elif state == 'vars':
+                _json[groupname].setdefault(state, {})
                 (var, val) = a[0].split("=")
                 _json[groupname][state][var] = val
             elif state == 'hosts':
                 host = a[0]
-                _json[groupname][state].append(host)
+                _json[groupname].setdefault(state, []).append(host)
                 if row.find(" ") != -1:
-                    _json["_meta"]["hostvars"][host] = {}
+                    _json["_meta"]["hostvars"].setdefault(host, {})
                     for i in range(1, len(a)):
                         (var, val) = a[i].split("=")
                         _json["_meta"]["hostvars"][host][var] = val
-            elif state == '':
-                raise ValueError("Invalid data")
+            else:
+                raise ValueError('invalid data')
     return _json
 
 
