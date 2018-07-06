@@ -1,4 +1,6 @@
+[![Build Status](https://travis-ci.org/sudnitsina/ini_to_json.svg?branch=master)](https://travis-ci.org/sudnitsina/ini_to_json)
 # ini_to_json
+required python > 2.7
 Script to convert from Ansible ini to JSON format
 ```
 {
