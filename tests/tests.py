@@ -1,9 +1,7 @@
-from unittest import TestCase
-
-from ini_to_json.ini_converter import serializer
+import unittest
 
 
-class TestConversion(TestCase):
+class TestConversion(unittest.TestCase):
     def test_convert(self):
         test_data = '''
                     [atlanta]
@@ -82,3 +80,14 @@ class TestConversion(TestCase):
         321
         '''
         self.assertRaises(ValueError, serializer, test_data)
+
+
+if __name__ == '__main__':
+    if __package__ is None:
+        import sys
+        from os import path
+        sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+        from ini_converter import serializer
+    else:
+        from ini_converter import serializer
+    unittest.main()
