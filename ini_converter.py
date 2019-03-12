@@ -6,12 +6,15 @@ import shlex
 
 
 def serializer(data):
+    """ Convert ini format inventory into json
+    """
     if not isinstance(data, str):
         raise ValueError("Invalid data")
+
     _json = {"_meta": {"hostvars": {}}}
     _parser = re.compile(
                 r'''^\[
-                        ([^:\]\s]+)             # group name (see groupname below)
+                        ([^:\]\s]+)             # group name
                         (?::(\w+))?             # optional : and tag name
                     \]
                     \s*                         # ignore trailing whitespace
@@ -28,7 +31,7 @@ def serializer(data):
             continue
         m = _parser.match(row)
         if m:
-            (groupname, state) = m.groups()        
+            (groupname, state) = m.groups()
             state = state or 'hosts'
             if groupname not in _json:
                 _json[groupname] = {}
