@@ -23,9 +23,9 @@ def serializer(data):
                 ''', re.X
     )
 
-    state = None
-    groupname = ''
-    for row in data.split('\n'):
+    state = 'hosts'
+    groupname = 'ungrouped'
+    for row in data.splitlines():
         row = row.strip()
         if row == '' or row.startswith(";") or row.startswith("#"):
             continue
@@ -44,6 +44,8 @@ def serializer(data):
                 (var, val) = a[0].split("=")
                 _json[groupname][state][var] = val
             elif state == 'hosts':
+                if groupname not in _json:
+                    _json[groupname] = {}
                 host = a[0]
                 _json[groupname].setdefault(state, []).append(host)
                 if row.find(" ") != -1:
@@ -52,7 +54,7 @@ def serializer(data):
                         (var, val) = a[i].split("=")
                         _json["_meta"]["hostvars"][host][var] = val
             else:
-                raise ValueError('invalid data')
+                raise ValueError('invalid data: Section {} has unknown type:'.format(state))
     return _json
 
 
