@@ -178,7 +178,7 @@ class TestConversion(unittest.TestCase):
 
 
 class TestCLI(unittest.TestCase):
-    def test(self):
+    def test_json(self):
         cmd = ["python", "ini_converter.py", "-f", "tests/test_data.ini"]
         result = subprocess.check_output(cmd)
         exp_result = {
@@ -193,9 +193,37 @@ class TestCLI(unittest.TestCase):
             "g2": {"hosts": ["host4"]},
             "ungrouped": {"hosts": ["host1", "host2", "host3"]},
         }
-        import json
-        result = json.loads(result)
+        import ast
+        result = result.decode("utf-8")
+        result = ast.literal_eval(result)
         self.assertDictEqual(exp_result, result)
+
+    def test_yaml(self):
+        cmd = ["python", "ini_converter.py", "-f", "tests/test_data.ini", "--yaml"]
+        result = subprocess.check_output(cmd).decode("utf-8")
+        exp_result = """_meta:
+  hostvars:
+    host1: {}
+    host2:
+      ansible_host: 127.0.0.1
+      ansible_port: 44
+    host3:
+      ansible_host: 127.0.0.1
+      ansible_port: 45
+g1:
+  hosts:
+  - host4
+g2:
+  hosts:
+  - host4
+ungrouped:
+  hosts:
+  - host1
+  - host2
+  - host3
+
+"""
+        self.assertEqual(result, exp_result)
 
 
 if __name__ == "__main__":

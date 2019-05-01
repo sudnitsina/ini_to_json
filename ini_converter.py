@@ -65,7 +65,7 @@ def _variable_handler(string):
     try:
         var, val = string.split("=")
     except ValueError as e:
-        raise ValueError("Invalid variable '{}': {}.".format(string, e.message))
+        raise ValueError("Invalid variable '{}': {}.".format(string, str(e)))
 
     try:
         val = ast.literal_eval(val)
@@ -79,9 +79,15 @@ def _variable_handler(string):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", help="Path to the file")
+    parser.add_argument("--yaml", help="Convert to yaml", action="store_true")
     args = parser.parse_args()
 
     with open(args.file) as ini:
         f = ini.read()
 
-    print(json.dumps(serializer(f), sort_keys=True, indent=2))
+    if args.yaml:
+        import yaml
+        print(yaml.dump(serializer(f)))
+
+    else:
+        print(json.dumps(serializer(f), sort_keys=True, indent=2))
