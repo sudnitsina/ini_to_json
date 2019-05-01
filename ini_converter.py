@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import argparse
+import ast
 import json
 import re
 import shlex
@@ -61,10 +62,10 @@ def serializer(data):
 def _variable_handler(string):
     var, val = string.split("=")
     try:
-        val = eval(val)
+        val = ast.literal_eval(val)
     except SyntaxError:
         pass
-    except NameError:
+    except ValueError:
         pass
     return var, val
 
