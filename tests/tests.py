@@ -1,4 +1,5 @@
 import unittest
+import subprocess
 
 
 class TestConversion(unittest.TestCase):
@@ -174,6 +175,27 @@ class TestConversion(unittest.TestCase):
         }
         my_json = serializer(test_data)
         self.assertDictEqual(my_json, exp_result)
+
+
+class TestCLI(unittest.TestCase):
+    def test(self):
+        cmd = ["python", "ini_converter.py", "-f", "tests/test_data.ini"]
+        result = subprocess.check_output(cmd)
+        exp_result = {
+            "_meta": {
+                "hostvars": {
+                    "host1": {},
+                    "host2": {"ansible_host": "127.0.0.1", "ansible_port": 44},
+                    "host3": {"ansible_host": "127.0.0.1", "ansible_port": 45},
+                }
+            },
+            "g1": {"hosts": ["host4"]},
+            "g2": {"hosts": ["host4"]},
+            "ungrouped": {"hosts": ["host1", "host2", "host3"]},
+        }
+        import json
+        result = json.loads(result)
+        self.assertDictEqual(exp_result, result)
 
 
 if __name__ == "__main__":
