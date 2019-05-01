@@ -42,6 +42,8 @@ def serializer(data):
                 _json[groupname].setdefault(section, []).append(a[0])
             elif section == "vars":
                 _json[groupname].setdefault(section, {})
+                if len(a) > 1:
+                    raise ValueError("Invalid variable '{}'.".format(row))
                 (var, val) = _variable_handler(a[0])
                 _json[groupname][section][var] = val
             elif section == "hosts":
@@ -60,7 +62,11 @@ def serializer(data):
 
 
 def _variable_handler(string):
-    var, val = string.split("=")
+    try:
+        var, val = string.split("=")
+    except ValueError as e:
+        raise ValueError("Invalid variable '{}': {}.".format(string, e.message))
+
     try:
         val = ast.literal_eval(val)
     except SyntaxError:
